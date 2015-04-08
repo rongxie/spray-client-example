@@ -1,2 +1,2 @@
 # spray-client-example
-spray client example for showing current rest call test tasks
+spray client example for showing current rest call tasks
