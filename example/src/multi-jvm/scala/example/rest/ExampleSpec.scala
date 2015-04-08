@@ -28,15 +28,9 @@ class ExampleSpecMultiJvmNode1 extends ExampleSpec
 class ExampleSpec extends MultiNodeSpec(ExampleSpecConfig)
   with MultiNodeSpecCallbacks with WordSpecLike with Matchers with BeforeAndAfterAll with ImplicitSender {
   
-
-import example.rest.RequestManager;
-import example.rest.RequestTask;
-import ExampleSpecConfig._
-
+  import ExampleSpecConfig._
   override def initialParticipants = roles.size
-
   override def beforeAll() = multiNodeSpecBeforeAll()
-
   override def afterAll() = multiNodeSpecAfterAll()
             
   override protected def atStartup() {
@@ -51,19 +45,23 @@ import ExampleSpecConfig._
       val reqMgr: ActorRef = system.actorOf(Props(classOf[ExampleTestManager], 2))
       reqMgr ! StartTest
       expectNoMsg
+      ExampleTestManager.cnt should be (2)
     }
-    
   }
 
 }
 
-class ExampleTestManager( n: Integer) extends RequestManager(n) with ShouldMatchers{
+object ExampleTestManager {
+  var cnt = 0
+}
+
+class ExampleTestManager(val n: Integer) extends RequestManager(n) with ShouldMatchers{
+  import ExampleTestManager._
   override implicit val rqClass: Class[_] = classOf[ExampleTestTask]
   override def processResult = {
-    println("Have "+count+ " Result Task Finished")
-    for (i <- 0 to count-1) {
-      result(i) should be ("Wellcome to Transaction Api Service!")
-    }
+    cnt += 1
+    println("Have "+cnt+ " Result Task Finished")
+    tmp should be ("Wellcome to Transaction Api Service!")
   }
 }
 

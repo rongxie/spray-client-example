@@ -27,6 +27,7 @@ case class StartTestTask extends RequestTaskMsg
 class RequestManager(n: Integer) extends Actor {
   implicit val rqClass: Class[_] = classOf[RequestTask]
   var result = ArrayBuffer[String]()
+  var tmp: String = null
   var count = 0
   def receive = {
     case StartTest => {
@@ -36,18 +37,20 @@ class RequestManager(n: Integer) extends Actor {
       }
     }
     case rs:String => {
-      count += 1
-      result += rs
-      if (count == n) {
-        processResult
-      }
+      tmp = rs
+      processResult
     }
     case _ => println("Sth Wrong (T_T)")
   }
-  def processResult = {
-    println("Got "+count+ " Result Task Finished")
-    for (i <- 0 to count-1)
-      println(result(i))
+  
+  def processResult = { 
+    count += 1
+    result += tmp
+    if (count == n) {
+      println("Got "+count+ " Result Task Finished")
+      for (i <- 0 to count-1)
+        println(result(i))
+    }
   }
 }
 
